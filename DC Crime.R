@@ -72,6 +72,24 @@ df_time$Hour <- factor(df_time$hour, level = 0:23, label = hour_format)
 
 ggplot(df_time, aes(x = hour, y = DayofWeek, fill = count)) +
   geom_tile() +
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.6), legend.title = element_blank(), legend.position="top", legend.direction="horizontal", legend.key.width=unit(2, "cm"), legend.key.height=unit(0.25, "cm"), legend.margin=unit(-0.5,"cm"), panel.margin=element_blank()) +
   labs(x = "Hour of Crime", y = "Day of Week of Crime", title = "# of Police Arrests in DC from 2008 - 2016, by Time of Arrest") +
-  scale_fill_gradient(low = "white", high = "#27AE60")
+  scale_fill_gradient(low = "white", high = "#45b293") +
+  coord_fixed(ratio=1) + 
+  theme(text=element_text(size = 12,family="Courier New" ))
+
+
+#factor by crime category
+df_time_crime <- dataset[,-which(names(dataset) %in% c("REPORT_DAT"))] %>%
+  group_by(OFFENSE, DayofWeek, hour) %>%
+  summarize(count = n())
+
+df_time_crime$DayofWeek <- factor(df_time_crime$DayofWeek, level = rev(dow_format))
+df_time_crime$Hour <- factor(df_time_crime$hour, level = 0:23, label = hour_format)
+
+head(df_time_crime)
+
+ggplot(df_time_crime, aes(x = hour, y = DayofWeek, fill = count)) +
+  geom_tile() +
+  labs(x = "Hour of Crime", y = "Day of Week of Crime", title = "# of Police Arrests in DC from 2008 - 2016, by Offense and Time of Arrest") +
+  scale_fill_gradient(low = "white", high = "#45b293") +
+  facet_wrap(~ OFFENSE, nrow = 3)
